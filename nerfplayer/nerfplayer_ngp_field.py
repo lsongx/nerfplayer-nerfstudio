@@ -34,7 +34,7 @@ from nerfstudio.field_components.spatial_distortions import (
     SceneContraction,
     SpatialDistortion,
 )
-from nerfstudio.fields.base_field import Field, shift_directions_for_tcnn
+from nerfstudio.fields.base_field import Field, get_normalized_directions
 
 from nerfplayer.temporal_grid import TemporalGridEncoder
 
@@ -172,7 +172,7 @@ class NerfplayerNGPField(Field):
         self, ray_samples: RaySamples, density_embedding: Optional[Tensor] = None
     ) -> Dict[FieldHeadNames, Tensor]:
         assert density_embedding is not None
-        directions = shift_directions_for_tcnn(ray_samples.frustums.directions)
+        directions = get_normalized_directions(ray_samples.frustums.directions)
         directions_flat = directions.view(-1, 3)
 
         if self.direction_encoding is not None:

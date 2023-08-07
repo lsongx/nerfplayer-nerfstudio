@@ -39,7 +39,7 @@ from nerfstudio.field_components.field_heads import (
     UncertaintyFieldHead,
 )
 from nerfstudio.field_components.spatial_distortions import SpatialDistortion
-from nerfstudio.fields.base_field import Field, shift_directions_for_tcnn
+from nerfstudio.fields.base_field import Field, get_normalized_directions
 
 from nerfplayer.temporal_grid import TemporalGridEncoder
 
@@ -201,7 +201,7 @@ class NerfplayerNerfactoField(Field):
     ) -> None:
         super().__init__()
 
-        self.aabb = Parameter(aabb, requires_grad=False)
+        self.register_buffer("aabb", aabb)
         self.geo_feat_dim = geo_feat_dim
 
         self.spatial_distortion = spatial_distortion
@@ -338,7 +338,7 @@ class NerfplayerNerfactoField(Field):
         if ray_samples.camera_indices is None:
             raise AttributeError("Camera indices are not provided.")
         camera_indices = ray_samples.camera_indices.squeeze()
-        directions = shift_directions_for_tcnn(ray_samples.frustums.directions)
+        directions = get_normalized_directions(ray_samples.frustums.directions)
         directions_flat = directions.view(-1, 3)
         d = self.direction_encoding(directions_flat)
 
