@@ -5,7 +5,7 @@ Implementation of NeRFPlayer (https://arxiv.org/abs/2210.15947) with InstantNGP 
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import List, Literal, Type
+from typing import List, Literal, Type, TYPE_CHECKING
 
 import nerfacc
 import torch
@@ -31,8 +31,9 @@ from nerfstudio.model_components.renderers import (
 )
 from nerfstudio.models.base_model import Model
 from nerfstudio.models.instant_ngp import InstantNGPModelConfig, NGPModel
-
-from nerfplayer.nerfplayer_ngp_field import NerfplayerNGPField
+if TYPE_CHECKING:
+    # Importing NerfplayerNGPField requires tcnn and CUDA
+    from nerfplayer.nerfplayer_ngp_field import NerfplayerNGPField
 
 
 @dataclass
@@ -83,10 +84,13 @@ class NerfplayerNGPModel(NGPModel):
     """
 
     config: NerfplayerNGPModelConfig
-    field: NerfplayerNGPField
+    field: 'NerfplayerNGPField'
 
     def populate_modules(self):
         """Set the fields and modules."""
+        # Importing NerfplayerNGPField requires tcnn and CUDA
+        from nerfplayer.nerfplayer_ngp_field import NerfplayerNGPField
+
         Model.populate_modules(self)
 
         if self.config.disable_scene_contraction:

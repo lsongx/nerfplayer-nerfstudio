@@ -49,8 +49,6 @@ from nerfstudio.model_components.shaders import NormalsShader
 from nerfstudio.models.base_model import Model
 from nerfstudio.models.nerfacto import NerfactoModel, NerfactoModelConfig
 
-from nerfplayer.nerfplayer_nerfacto_field import NerfplayerNerfactoField, TemporalHashMLPDensityField
-
 
 @dataclass
 class NerfplayerNerfactoModelConfig(NerfactoModelConfig):
@@ -97,6 +95,9 @@ class NerfplayerNerfactoModel(NerfactoModel):
 
     def populate_modules(self):
         """Set the fields and modules."""
+        # Importing NerfplayerNerfactoField and TemporalHashMLPDensityField requires tcnn and CUDA
+        from nerfplayer.nerfplayer_nerfacto_field import NerfplayerNerfactoField, TemporalHashMLPDensityField
+
         Model.populate_modules(self)
 
         scene_contraction = SceneContraction(order=float("inf"))
