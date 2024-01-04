@@ -13,6 +13,7 @@ from nerfstudio.data.dataparsers.dycheck_dataparser import DycheckDataParserConf
 from nerfstudio.data.datasets.depth_dataset import DepthDataset
 from nerfstudio.engine.optimizers import AdamOptimizerConfig
 from nerfstudio.engine.trainer import TrainerConfig
+from nerfstudio.engine.schedulers import ExponentialDecaySchedulerConfig
 from nerfstudio.pipelines.base_pipeline import VanillaPipelineConfig
 from nerfstudio.pipelines.dynamic_batch import DynamicBatchPipelineConfig
 from nerfstudio.plugins.types import MethodSpecification
@@ -34,20 +35,24 @@ nerfplayer_nerfacto = MethodSpecification(
                 dataparser=DycheckDataParserConfig(),
                 train_num_rays_per_batch=4096,
                 eval_num_rays_per_batch=4096,
-                camera_optimizer=CameraOptimizerConfig(
-                    mode="SO3xR3", optimizer=AdamOptimizerConfig(lr=6e-4, eps=1e-8, weight_decay=1e-2)
-                ),
             ),
-            model=NerfplayerNerfactoModelConfig(eval_num_rays_per_chunk=1 << 15),
+            model=NerfplayerNerfactoModelConfig(
+                eval_num_rays_per_chunk=1 << 15,
+                camera_optimizer=CameraOptimizerConfig(mode="SO3xR3"),
+            ),
         ),
         optimizers={
             "proposal_networks": {
                 "optimizer": AdamOptimizerConfig(lr=1e-2, eps=1e-15),
-                "scheduler": None,
+                "scheduler": ExponentialDecaySchedulerConfig(lr_final=0.0001, max_steps=200000),
             },
             "fields": {
                 "optimizer": AdamOptimizerConfig(lr=1e-2, eps=1e-15),
-                "scheduler": None,
+                "scheduler": ExponentialDecaySchedulerConfig(lr_final=0.0001, max_steps=200000),
+            },
+            "camera_opt": {
+                "optimizer": AdamOptimizerConfig(lr=1e-3, eps=1e-15),
+                "scheduler": ExponentialDecaySchedulerConfig(lr_final=1e-4, max_steps=5000),
             },
         },
         viewer=ViewerConfig(num_rays_per_chunk=1 << 15),
@@ -81,7 +86,7 @@ nerfplayer_ngp = MethodSpecification(
         optimizers={
             "fields": {
                 "optimizer": AdamOptimizerConfig(lr=1e-2, eps=1e-15),
-                "scheduler": None,
+                "scheduler": ExponentialDecaySchedulerConfig(lr_final=0.0001, max_steps=200000),
             }
         },
         viewer=ViewerConfig(num_rays_per_chunk=64000),
