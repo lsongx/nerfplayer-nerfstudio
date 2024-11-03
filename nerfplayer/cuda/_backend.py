@@ -34,8 +34,8 @@ if cuda_toolkit_available():
         _C = load(
             name=NAME,
             sources=glob.glob(os.path.join(PATH, "csrc/*.cu")),
-            extra_cflags=["-O3", "-std=c++14"],
-            extra_cuda_cflags=["-O3", "-std=c++14"],
+            extra_cflags=["-O3", "-std=c++17"],
+            extra_cuda_cflags=["-O3", "-std=c++17"],
             extra_include_paths=[],
         )
     else:
@@ -46,8 +46,8 @@ if cuda_toolkit_available():
         _C = load(
             name=NAME,
             sources=glob.glob(os.path.join(PATH, "csrc/*.cu")),
-            extra_cflags=["-O3", "-std=c++14"],
-            extra_cuda_cflags=["-O3", "-std=c++14"],
+            extra_cflags=["-O3", "-std=c++17"],
+            extra_cuda_cflags=["-O3", "-std=c++17"],
             extra_include_paths=[],
         )
         print("nerfstudio field components: Setting up CUDA finished")

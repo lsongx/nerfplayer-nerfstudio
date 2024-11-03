@@ -49,6 +49,8 @@ from nerfstudio.model_components.shaders import NormalsShader
 from nerfstudio.models.base_model import Model
 from nerfstudio.models.nerfacto import NerfactoModel, NerfactoModelConfig
 
+from nerfstudio.cameras.camera_optimizers import CameraOptimizer, CameraOptimizerConfig
+
 
 @dataclass
 class NerfplayerNerfactoModelConfig(NerfactoModelConfig):
@@ -82,6 +84,9 @@ class NerfplayerNerfactoModelConfig(NerfactoModelConfig):
     """Temporal TV balancing weight for feature channels."""
     depth_weight: float = 1e-1
     """depth loss balancing weight for feature channels."""
+
+    camera_optimizer: CameraOptimizerConfig = field(default_factory=lambda: CameraOptimizerConfig(mode="SO3xR3"))
+    """Config of the camera optimizer to use"""
 
 
 class NerfplayerNerfactoModel(NerfactoModel):
@@ -117,6 +122,10 @@ class NerfplayerNerfactoModel(NerfactoModel):
 
         self.density_fns = []
         num_prop_nets = self.config.num_proposal_iterations
+
+        self.camera_optimizer: CameraOptimizer = self.config.camera_optimizer.setup(
+            num_cameras=self.num_train_data, device="cpu"
+        )
 
         # Build the proposal network(s)
         proposal_networks: List[TemporalHashMLPDensityField] = []
